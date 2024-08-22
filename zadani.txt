@@ -1,0 +1,79 @@
+Hra: Bomberman
+
+Tato semestrální práce patří do kategorie her. Podle zadí je mým cílem je vytvořit konkrétní hru, která bude modifikovatelná prostřednictvím konfiguračních souborů uložené v examples - config.json a levels/* . Pro parsování json používatm knihovnu uvedenou ve složce libs.
+Konfigurovatelné jsou tyto věci:
+1. složky, kde jsou umístěné tabulky skóre
+2. složka, kde jsou soubory jednotlivých levelů
+3. statistiky hráčů, prvotní nastavení pro všechny hráče
+4. tlačítka pro ovládání lidských hráčů (max 4)
+5. šance, že padne daný bonus po zničení zdi, šance může být jakékoliv kladné číslo (pokud je 0 nebo záporné, tak se předpokládá šance 20), šance se pak rozdělí poměrem
+6. systém skóre, určité akce nebo objekty přinášejí jistý počet bodů
+Dále pak lze konfigurovat levely v levels složce.
+
+Implementuji jednoduchou hru po vzoru hry Bomberman a to s užití ncurses. V mé hře Bomberman hráč může umisťovat bomby, které po výbuchu ničí okolní zničitelné zdi a případně eliminují postavy nebo aktivují výbuch dalších bomb v palební linii.
+
+Hra umožňuje hrát tyto dva režimy:
+1. hru 2 - 4 hráčů na jednom počítači (HUMAN_VS_HUMAN)
+2. hru 1 hráče proti počítači 1 - 3 (HUMAN_VS_PC)
+Hra má podporu až 4 hráčů.
+
+Hra nepodporuje real-time hraní, ale tahový režim. To znamená, že se hráči střídají ve svých tazích. Může se také stát, že když mají vybuchnout bomby, tak se tak stane a to kolo nehraje žádný z hráčů. Vybuchnutím se zničí, co se má zničit, odečtou se životy, kde je třeba, přičtou se zpět bomby 
+hráči, kterému bomby vybuchly, nachystají se bonusy v místech zničených zdí a vykreslí se samotné plameny.
+Když je hráč na řadě, tak se vypíše, že je tento hráč na řadě. Hráč pak může udělat 3 věci:
+1. pohybovat se po mapě o jeden krok (kde se kontroluje, jestli je tento krok validní a hráč nevstupuje do zdí nebo do bomb, pokud nemůže)
+2. položit bombu (bomba se položí pod hráče, v ten moment je hráč i bomba na stejném poli, až hráč z tohoto pole odejde nebude se do něj moct vrátit, pokud tedy nemá k dispozici bomb pass bonus).
+3. použít detonátor (padá jako jeden z bonusů), který odpálí všechny hráčovy položené bomby
+
+Budu implementovat jednoduché AI počítačového hráče. Tím, že náhodné tahy nestačí bude muset být alespoň trochu chytřejší. Vytvořila jsem dvě AI, easy Box Lover AI a medium Score Lover AI.
+
+*Box lover AI*
+Jeho jediným cílem je zničit všechny krabice (zničitelné zdi).
+Až dokončí zničení každé krabice ve hře, bude smutný.
+Takže to znamená, že se již nebude účastnit hry a spáchá sebevraždu.
+Pokud mu hrozí nebezpečí v podobě výbuchu jeho bomb  ukryje se.
+Nebude snažit schovat před jinými bombami.
+Snaží se být ve své práci rychlý, takže při první příležitosti použije detonátor, pokud ho má.
+
+*Score lover AI*
+Jeho jediným cílem je získat nejvyšší skóre.
+Pokusí se najít nejbohatší místo podle skóre a pokusí se ho získat.
+Každý předmět v této hře má skóre, které score lover zná.
+Je si vědom svého okolí, takže se bude krýt i před jinými bombami.
+
+Hra obsahuje následující bonusy:
+1. zvýšení počtu dostupných bomb
+2. zvětšení velikosti plamene vybuchující bomby
+3. bomb pass, hráč bude moct chodit přes číkoliv bomby (omezený na 5 tahů)
+4. zvýšení doby, ve které hráč musí rozhodnout, co zahraje (když to nestihne ztrácí právo na aktuální tah a bude potrestán odebráním 5 bodů)
+5. detonátor, umožňující odpálit všechny bomby daného hráče
+6. zvýšení počtu životů o 1
+
+Při spuštění aplikace hra nabídne přehledné menu, kde si uživatel může zvolit jaký chce herní režim nebo jestli chce vidět tabulku se skóre k jednotlivým režimům. Po zvolení volby se vyčte výběr všech levelů, ze kterých si uživatel může vybrat.
+
+Hra má systém skóre, tedy po zničení zdi, aktivování jiné bomby, sebrání bonusu nebo zabití nepřítele dostane hráč body, které se mu přičtou k jeho celkovému skóre. Zde je přehled, kolik bodů se za co přičte hráči (ale toto jde změnit v config.json):
+1. zabití nepřítele: 10
+2. aktivování jiné bomby: 5
+3. sebrání bonusu: 3
+4. zničení zdi: 2
+5. za každou svou vybuchlou bombu: 1
+6. sebezničení: -1
+
+Na konci hry (to znamená ve chvíli, kdy nežije více než 2 hráči) se hra zeptá každého lidského hráče na jeho jméno. Umožňuji alespoň jednoduchou modifikaci jména, kde lze odmazat poslední vložená písmena. Jméno nesmí obsahovat bíle znaky, netisknutelné znaky a musí být maximálně 14 písmenek dlouhé. Tyhle omezení jsou především z toho důvodu, abych mohla lépe a přehledně vypisovat jména nejlepších hráčů ve scoreboard.
+
+Při hraní hra zobrazuje informační tabulky pro všechny hráče. To je také důvod proč je hra hratelná jen pro maximálně 4 hráče, protože by se mi nedařilo vykreslovat tolik tabulek. Tyto tabulky obsahují informace o skore, životech, počet bomb, rychlosti zadávání vstupu, velikost plamenů a informaci jestli hráč má detonátor nebo bomb pass.
+
+Ve hře budou těmito znaky odlišeny jednotlivé objekty a hráči:
+- 'o': hráč
+- '#': nezničitelná zeď
+- '+': zničitelná zeď
+- 'X': bomba
+- 'x': plamen
+- ostatní velká písmena abecedy: bonusy
+- ' ': prázdné místo
+
+Kde se v tomto projektu užívá polymorfismus?
+1. *efekty bonusů*
+    Výše jsem popsala 6 možných bonusů. tyto bonusy jsou děti třídy Booster. Polymorfismus je zde obsažen v rámci metody useBonus, kterou si zašťiťují jednotlivé bonusy. Tato metoda obecně upravuje statistiky hráče.
+2. *ovládání hráče* (klávesnice vs. umělá inteligence)
+    Mám třídu Player, která má společné rozhraní, jako jsou různé gettery, settery a funkce doTurn. Polymorfní je zde metoda doTurn, která obecně má za úkol zjistit, co se vykoná za tah. Lidský hráč (HumanPlayer) toto dodá ze čtení z klávesnice (vrátí, kam se posunuje, jestli pokládá bombu nebo používá detonátor). Třídy derivované od PCPlayer, toto dodají podle svého algoritmu. 
+    Tyto třídy budou dále implementovat vlastní metody, pro přehlednější práci s doTurn (budeme části kódu delegovat na příslušné metody). Třídy odvozené od PCPlayer dále každá implementují polymorfní metodu getBombs, podle toho jak moc vnímají okolí kolem sebe.

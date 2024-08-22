@@ -1,0 +1,72 @@
+{
+    "scoreboards": {
+        "human_vs_human_dir": "./examples/scoreboards/human_vs_human/",
+        "human_vs_pc_dir": "./examples/scoreboards/human_vs_pc/"
+    },
+    "levels_dir": "./examples/levels/",
+    "players_stats": {
+        "speed": 3,
+        "lives": 1,
+        "bombs_available": 1,
+        "flames_power": 1,
+        "counter_on_bombs": 8,
+        "has_remote_control": 1,
+        "has_bomb_pass": 0
+    },
+    "player_0": {
+        "keys": {
+            "up": "w",
+            "down": "s",
+            "left": "a",
+            "right": "d",
+            "place_bomb": "e",
+            "remote_control": "f"
+        }
+    },
+    "player_1": {
+        "keys": {
+            "up": "8",
+            "down": "5",
+            "left": "4",
+            "right": "6",
+            "place_bomb": "9",
+            "remote_control": "+"
+        }
+    },
+    "player_2": {
+        "keys": {
+            "up": "i",
+            "down": "k",
+            "left": "j",
+            "right": "l",
+            "place_bomb": "o",
+            "remote_control": "p"
+        }
+    },
+    "player_3": {
+        "keys": {
+            "up": "c",
+            "down": "v",
+            "left": "x",
+            "right": "b",
+            "place_bomb": "n",
+            "remote_control": "m"
+        }
+    },
+    "probabilities_of_bonuses": {
+        "add_flames": 0,
+        "add_speed": 100,
+        "add_remote_control": 0,
+        "add_lifes": 0,
+        "add_bombs": 0,
+        "add_bomb_pass": 0
+    },
+    "score_system": {
+        "killing_other_player": 10,
+        "activating_another_bomb": 5,
+        "picking_up_bonus": 3,
+        "destroying_wall": 2,
+        "placing_bomb": 1,
+        "killing_self": -1
+    }
+}
